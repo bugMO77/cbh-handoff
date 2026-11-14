@@ -1,0 +1,61 @@
+Field,Observed Types,Present in 40 samples,Nullable,Example Observed Value,Meaning,Variation / Notes,Evidence Basis
+messages,array,40,No,list of role/content objects,Chat conversation,Always present; item shape varies (tool_calls optional on some items),40 samples
+messages[].role,string,40,No,system,Message role,"Observed roles: system, user, assistant",40 samples
+messages[].content,string,40,No,You are a vulnerability-intelligence assistant...,Message text,Always present on observed items,40 samples
+messages[].tool_calls,array,0,Yes,(not present in 40 samples),Tool-call entries on assistant turn,Documented in README; not present in the 40 retained records; source of viewer CastError,README + absence in sample
+tools,array,0,Yes,(not present in 40 samples),Tool definitions for tool-calling records,Documented in README; not present in the 40 retained records,README + absence in sample
+metadata,object,40,No,nested object,Labels and auxiliary fields,Always present; field set varies by split and source,40 samples
+metadata.dataset_key,string,40,No,000369f2ec518f80...,Per-record key/hash,Always present in sample; unique across 40 records,40 samples
+metadata.training_source,string,40,No,NVD CVE 2.0 annual feed,Record origin,"One of qwen_cve, NVD CVE 2.0 annual feed, web_offensive_elite_v2_sft, h1, portswigger_labs_sft, gapfill_synthetic, Official CVE Program record",40 samples + README
+metadata.split,string,40,No,train,Split name embedded in metadata,train/validation/test,40 samples
+metadata.merged_collection,string,40,No,merged_corpus_v1,Collection identifier,Always present in sample,40 samples
+metadata.merged_from_split,string,40,No,train,Original split before merge,Always present in sample,40 samples
+metadata.class,string,39,Yes,access_control,Vulnerability/report class label,1 of 40 records had no class; 35-class taxonomy per README; label can be backfilled,40 samples + README
+metadata.class_backfilled,boolean,13,Yes,false,Whether class was inferred from CWE map,Only on some records (backfill-eligible sources),40 samples + README
+metadata.cve_ids,array,36,Yes,['CVE-2014-6271'],Associated CVE identifiers,Can be empty list; absent on some non-CVE records,40 samples
+metadata.cwe,string,28,Yes,CWE-79,CWE identifier,Single CWE string in sample,40 samples
+metadata.official_cwe_ids,array,12,Yes,['CWE-79'],Official CWE identifiers from CVE record,Only on CVE-program/NVD-style records,40 samples
+metadata.cvss_score,number|null,24,Yes,7.5,CVSS score annotation,Observed float or null; 0.0 observed; not authoritative,40 samples
+metadata.cvss_score_status,string,4,Yes,computed,Status annotation for cvss_score,Present on a minority of records,40 samples
+metadata.severity,string,24,Yes,high,Severity annotation,critical/high/medium/low/informational in README; annotation only,40 samples + README
+metadata.quality_score,integer,26,Yes,13,Internal quality score,Observed integers 9-15 in sample; absent on NVD records,40 samples
+metadata.completeness,number,24,Yes,1.0,Completeness ratio,Observed floats 0.6-1.0 in sample,40 samples
+metadata.missing_sections,array,24,Yes,"['impact','remediation']",Sections absent in source,Empty or populated list,40 samples
+metadata.has_future_cve,boolean,24,Yes,false,Whether record had forward-dated CVE,Forward-dated rows dropped per README; flag remains on some records,40 samples + README
+metadata.is_negative,boolean,26,Yes,false,Negative / not-a-vulnerability example,Flag,40 samples
+metadata.is_short_response,boolean,24,Yes,false,Short-response flag,Flag,40 samples
+metadata.is_paraphrased,boolean,2,Yes,false,Paraphrase flag (HackerOne records),Source-specific,40 samples
+metadata.repetitive_prompt,boolean,24,Yes,false,Repetitive-prompt flag,Flag,40 samples
+metadata.rejection_reason,null,26,Yes,null,Reason for rejection,Always null in observed sample,40 samples
+metadata.num_turns,integer,26,Yes,3,Number of conversation turns,Observed 3 and higher,40 samples
+metadata.response_length,integer,26,Yes,845,Response length metric,Source-specific,40 samples
+metadata.signal,boolean,2,Yes,true,Signal flag,Few records,40 samples
+metadata.task,string,12,Yes,cve_explanation,Task type,CVE/NVD-style records,40 samples
+metadata.fact_scope,string,12,Yes,official_record,Scope of factual basis,CVE/NVD-style records,40 samples
+metadata.source_name,string,12,Yes,NVD,Source organisation/system name,CVE/NVD-style records,40 samples
+metadata.source_url,string,12,Yes,https://nvd.nist.gov/vuln/detail/CVE-...,URL to source record,CVE/NVD-style records,40 samples
+metadata.source_record_published,string,12,Yes,2014-09-24T00:00:00Z,Source publication timestamp,ISO-8601-like,40 samples
+metadata.source_record_last_modified,string,12,Yes,2025-10-22T00:05:36.342Z,Source last-modified timestamp,ISO-8601-like,40 samples
+metadata.source_record_status,string,12,Yes,Published,Source record status,CVE/NVD-style records,40 samples
+metadata.reference_chunk_count,integer,4,Yes,1,Reference chunk count,Chunked-reference records,40 samples
+metadata.reference_chunk_index,integer,4,Yes,0,Reference chunk index,Chunked-reference records,40 samples
+metadata.reference_count_in_chunk,integer,4,Yes,1,References in chunk,Chunked-reference records,40 samples
+metadata.version_chunk_count,integer,2,Yes,1,Version chunk count,Versioned records,40 samples
+metadata.version_chunk_index,integer,2,Yes,0,Version chunk index,Versioned records,40 samples
+metadata.product_record_index,integer,2,Yes,0,Product record index,Product-split records,40 samples
+metadata.id,integer|string,2,Yes,1361804,HackerOne report id (int) or record id (string),Type varies by source,40 samples
+metadata.program,string,2,Yes,fastify,HackerOne program name,HackerOne records,40 samples
+metadata.severity_rating,string,2,Yes,medium,HackerOne severity rating,HackerOne records,40 samples
+metadata.record_id,string,2,Yes,148489b82c546225,Record identifier,Source-specific,40 samples
+metadata.source,string,4,Yes,Black Hat Go,Original book/resource,Offensive-education records,40 samples
+metadata.source_author,string,2,Yes,(author string),Book author(s),Offensive-education records,40 samples
+metadata.domain,string,2,Yes,web_appsec,Content domain,Offensive-education records,40 samples
+metadata.category,string,2,Yes,Zip Slip,Payload category,Payload-style records,40 samples
+metadata.category_type,string,2,Yes,payload,Content type,Payload-style records,40 samples
+metadata.chapter,string,2,Yes,3 HTTP Clients and Remote Interaction,Book chapter,Book-derived records,40 samples
+metadata.section,string,1,Yes,Zip Slip > Methodology,Section path,Payload-style records,40 samples
+metadata.file,string,1,Yes,Zip Slip/README.md,Source file path,Payload-style records,40 samples
+metadata.license,string,1,Yes,MIT,Declared licence of source content,Source-specific; not a dataset-level licence,40 samples
+metadata.source_repo,string,1,Yes,https://github.com/swisskyrepo/PayloadsAllTheThings,Upstream repository URL,Payload-style records,40 samples
+metadata.difficulty,string,2,Yes,beginner,Difficulty level,Lab/CTF records,40 samples
+manifest.json:classes,array,0,n/a,219 topic/chapter strings,Manifest 'classes' list,NOT the same as metadata.class (35 labels); appears to be a topic/chapter taxonomy; do not equate the two,manifest.json inspected

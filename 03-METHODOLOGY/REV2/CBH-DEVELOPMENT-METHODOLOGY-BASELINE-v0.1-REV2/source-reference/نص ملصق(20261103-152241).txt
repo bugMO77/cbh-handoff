@@ -1,0 +1,1273 @@
+جميل بم ان عندنا audit للملفات في احنا عايزين نعمل   Value Assessment للملفات كلها بي المره عشان لما نعمل ال blue print و نبتدي تعديل فعلي نعرف هنبني ايه جديد او هنعدل ايه بي المره بحيث نمشي علي نظام واحد
+بالظبط. وده في رأيي القرار الصح معماريًا. بدل ما نقيّم الـ Skills لوحدها، وبعدها نكتشف إن الـ Engine أو الـ Commands محتاجين إعادة تصميم، نعمل Project-Wide Value Assessment مرة واحدة.
+
+الفكرة إننا قبل ما نرسم الـ Blueprint نكون فاهمين CBH بالكامل على مستوى الملفات والاعتماديات، ونعرف بالضبط هنحتفظ بإيه، ونعدل إيه، ونبني إيه جديد.
+
+إذن هنعدّل Phase 3 بالكامل. الـ Skill Value Assessment هيبقى جزء من التقييم الشامل، مش مرحلة منفصلة.
+
+Phase 3 — Project-Wide Value Assessment
+Next Phase
+1. نطاق التقييم
+هنقيّم كل ملفات المشروع الأساسية، مش الـ Skills بس.
+
+المجموعة
+
+الملفات التي سنقيّمها
+
+Skills
+
+الـ 83 Skill والـ references والـ supporting resources
+
+Commands
+
+جميع Slash Commands
+
+CLI
+
+أوامر وواجهات cbh/cli.py والمكونات المرتبطة بها
+
+Engine
+
+جميع مراحل الـ Engagement Engine
+
+Agent
+
+Agent execution وprovider integration
+
+Runtime
+
+State management، memory، evidence، logging
+
+Recon & Tools
+
+أدوات التكامل وعمليات reconnaissance
+
+Scripts
+
+Installation، setup، utilities
+
+Configuration
+
+JSON، YAML، TOML، manifests، environment examples
+
+Testing & Evaluation
+
+Unit tests، integration tests، labs، eval harness
+
+CI/CD
+
+GitHub Actions وworkflow automation
+
+Documentation
+
+README، architecture، guides، changelog
+
+Assets & Templates
+
+الصور، القوالب، البيانات والموارد المساعدة
+
+هنغطي كل الملفات الأصلية الموجودة في المشروع، لكن مش هنضيّع وقتنا في تقييم ملفات .git أو caches أو dependencies المنزّلة أو generated artifacts كأنها أجزاء من المنتج. الـ lockfiles والـ manifests والموارد الثنائية هتتقيّم حسب دورها الفعلي.
+
+2. هنقيّم كل ملف من إيه؟
+مش مجرد هل الملف مفيد أم لا.
+
+كل ملف هيتقيّم حسب:
+
+Purpose & Necessity: بيعمل إيه وهل CBH محتاجه؟
+
+Mission Value: مدى مساهمته في Bug Bounty Hunting.
+
+Functionality: هل وظيفته مكتملة ومفيدة؟
+
+Integration: هل باقي النظام بيستخدمه فعلًا؟
+
+Dependencies: بيعتمد على إيه، ومين بيعتمد عليه؟
+
+Uniqueness: هل بيقدم وظيفة غير مكررة؟
+
+Technical Quality: صحة التنفيذ وجودته.
+
+Security & Safety: Scope enforcement، المخاطر، وحدود التنفيذ.
+
+Maintainability: سهولة صيانته وتطويره.
+
+Testing: هل عليه اختبارات كافية تثبت عمله؟
+
+وفي نقطة مهمة: ملف مثل engine/scope.py ممكن تكون قيمته عالية جدًا حتى لو مش بيقدم Vulnerability Hunting مباشرة، لأنه ضروري لسلامة النظام. هنفصل بين قيمة الملف للمنتج وقيمته في عملية الـ Hunting.
+
+3. القرار النهائي لكل ملف
+كل ملف هياخد قرارًا واضحًا:
+
+القرار
+
+المعنى
+
+KEEP AS-IS
+
+نحتفظ به كما هو
+
+MODIFY
+
+نعدّل وظيفة أو محتوى محدد
+
+REFACTOR
+
+نعيد تنظيم التنفيذ دون تغيير الهدف الأساسي
+
+MERGE
+
+ندمجه مع ملفات أخرى
+
+SPLIT
+
+نقسمه لمكونات أصغر
+
+REPLACE
+
+نستبدله بتنفيذ أفضل
+
+CREATE NEW
+
+نحتاج إنشاء مكون جديد
+
+MOVE
+
+ننقله إلى مكان معماري أنسب
+
+DEPRECATE
+
+نوقف الاعتماد عليه تدريجيًا
+
+REMOVE
+
+لا توجد ضرورة للاحتفاظ به
+
+OPTIONAL
+
+نحتفظ به كإضافة اختيارية
+
+كل قرار لازم يكون له سبب ودليل وتأثير على بقية النظام. ومفيش حذف أو دمج فعلي في المرحلة دي.
+
+4. أهم جزء: Dependency & Impact Mapping
+دي من أهم مخرجات المرحلة.
+
+عايزين نعرف مثلًا:
+
+لو عدّلنا skill_map.py، إيه المكونات المتأثرة؟
+
+لو غيّرنا Agent adapter، إيه اللي هيحتاج إعادة ربط؟
+
+هل الـ CLI والـ Engine بيكرروا نفس الوظائف؟
+
+هل فيه Skills موجودة لكن مش قابلة للوصول من Runtime؟
+
+هل فيه Commands بتعتمد على Skills أو ملفات غير موجودة؟
+
+هل فيه Scripts بتعمل نفس وظيفة Engine modules؟
+
+هل فيه اختبارات بتختبر وظائف قديمة أو مختلفة عن الـ implementation الحالي؟
+
+مش هنكتفي بإننا نعرف وظيفة كل ملف. لازم نفهم علاقاته بباقي النظام.
+
+5. المخرجات المطلوبة
+بدل ما نطلع بتقرير Skills فقط، هنجهّز أربعة مخرجات شاملة:
+
+1. PROJECT_FILE_INVENTORY.csv
+
+قائمة كل ملفات المشروع وتصنيفها ووظيفتها وحالتها.
+2. PROJECT_VALUE_ASSESSMENT.md
+
+تحليل القيمة والجودة والمشاكل والقرارات المقترحة لكل مجموعة ومكون.
+3. DEPENDENCY_IMPACT_MATRIX.csv
+
+خريطة الاعتماديات وتأثير تعديل أو استبدال أي ملف على باقي النظام.
+4. PROJECT_DECISION_MATRIX.csv
+
+قرار كل ملف: الاحتفاظ أو التعديل أو الدمج أو الاستبدال أو الإزالة.
+6. خريطة المراحل بعد التعديل
+هنمشي بالتسلسل ده:
+
+Phase
+
+الاسم
+
+الحالة
+
+0
+
+Foundation & Repository Setup
+
+Closed
+
+1
+
+Repository & Architecture Audit
+
+Closed
+
+2
+
+Skills Deep Audit
+
+Closed
+
+3
+
+Project-Wide Value Assessment
+
+Next
+
+4
+
+Unified System Architecture Blueprint
+
+Pending
+
+5
+
+Implementation Planning & Migration Strategy
+
+Pending
+
+6
+
+Core Architecture Implementation
+
+Pending
+
+7
+
+Agent & Runtime Integration
+
+Pending
+
+8
+
+Scope, Safety & Evidence Enforcement
+
+Pending
+
+9
+
+Hunting Workflow Integration
+
+Pending
+
+10
+
+Testing & Evaluation
+
+Pending
+
+11
+
+Documentation & Release Readiness
+
+Pending
+
+7. إيه الفرق بين Phase 3 وPhase 4؟
+دي نقطة عايز أثبتها من البداية:
+
+Phase 3 تجيب على:
+
+عندنا إيه؟
+
+كل ملف وظيفته إيه؟
+
+إيه المفيد والمكرر والضعيف؟
+
+إيه اللي لازم يتعدل؟
+
+إيه اللي ناقصنا؟
+
+إيه تأثير كل قرار على النظام؟
+
+Phase 4 تجيب على:
+
+CBH المفروض يبقى شكله إيه؟
+
+المكونات هتتوزع إزاي؟
+
+إيه الـ architecture المستهدفة؟
+
+إيه الملفات اللي هنحتفظ بها؟
+
+إيه اللي هيتغير أو يندمج؟
+
+إيه الملفات الجديدة اللي لازم نبنيها؟
+
+المكونات هتتواصل مع بعضها إزاي؟
+
+Phase 5 تحول الـ Blueprint إلى خطة تنفيذ مرتبة، وبعد اعتمادها نبدأ التعديلات الفعلية.
+
+رأيي النهائي: نعتمد التغيير ده ونعتبر أي Prompt قديم خاص بـ Skills Value Assessment وحدها ملغيًا. هنقيّم CBH كله في Phase واحدة، والـ 83 Skill هيكونوا جزءًا منها.
+
+كده لما نوصل للـ Blueprint مش هنكون بنصمم نظامًا بناءً على الانطباعات؛ هيكون عندنا خريطة للمنتج الحالي، وقيمة كل مكون، واعتمادياته، والتغيير المطلوب فيه. وده اللي هيخلينا ننفذ بنظام واحد بدل ترقيع أجزاء متفرقة كل شوية. 🔧
+
+جميل تمام الملفات الي قيمناها و ليه audit نسيبها يعني مش نرجع نقيمها من جديد عشان مش نقعد سنتنين تاني
+بالظبط، ودي لازم تبقى قاعدة أساسية في طريقة شغلنا من هنا. مش هنعيد شغل خلصناه لمجرد إننا دخلنا Phase جديدة. 😂
+
+هنستخدم نتائج الـ Audits السابقة كـ Baseline رسمي للـ Phase 3، ومش هنعيد تقييم الملفات اللي عندنا عنها أدلة كافية.
+
+هنقسم الملفات إلى 3 مجموعات
+المجموعة
+
+طريقة التعامل
+
+Previously Audited
+
+نستخدم نتائج الـ Audit السابقة مباشرة
+
+Partially Audited
+
+نكمل فقط الجزء أو المعلومة الناقصة
+
+Not Audited
+
+نعمل لها Assessment لأول مرة
+
+1. الملفات التي انتهينا منها
+دي تشمل:
+
+Skills Layer
+
+الـ 83 Skill.
+
+الـ 22 Supporting Files.
+
+نتائج التكرار، الجودة، الأمان، والتكامل.
+
+الـ Skill Mapper والـ Command References التي تناولها التدقيق.
+
+Architecture & Core Components
+
+CLI.
+
+Engagement Engine.
+
+Agent.
+
+Scope handling.
+
+Runtime وMemory وEvidence.
+
+OpenCode وBurp MCP integration.
+
+Testing وEvaluation.
+
+Documentation وCI/CD.
+
+هنرجع للتقارير السابقة ونستخرج منها المعلومات والقرارات. مش هنطلب من OpenCode قراءة الملفات دي من البداية.
+
+2. إمتى نرجع لملف اتعمله Audit؟
+في حالات محددة فقط:
+
+ظهر تناقض بين تقريرين.
+
+الـ Audit السابق لم يغطِّ نقطة ضرورية للقرار.
+
+الملف اتغير عن الـ baseline.
+
+محتاجين نعرف Dependency أو Behavior غير موثق.
+
+محتاجين نتحقق من معلومة لا يمكن استنتاجها من التدقيق السابق.
+
+وحتى هنا، هنفحص الجزء المطلوب فقط، مش الملف كله.
+
+هنضيف خطوة مهمة في بداية Phase 3
+Audit Evidence Reconciliation
+
+قبل أي تقييم جديد، نعمل Mapping بين ملفات المشروع الحالية والـ Audits الموجودة.
+
+لكل ملف نسجل:
+
+Audit Status.
+
+Existing Evidence.
+
+Previous Findings.
+
+Current Git Status.
+
+Missing Information.
+
+Assessment Readiness.
+
+Reuse existing evidence
+
+Targeted inspection only
+
+Full re-audit
+
+شكل Phase 3 بعد التعديل
+Audit Evidence Reconciliation: تجميع نتائج التدقيق السابق وربطها بملفات المشروع.
+
+Repository Coverage Mapping: تحديد الملفات التي لم تحصل على تغطية كافية فقط.
+
+Project-Wide Value Assessment: تقييم قيمة كل مكونات المشروع باستخدام الأدلة الموجودة.
+
+Dependency & Impact Mapping: فهم علاقات الملفات وتأثير التعديلات.
+
+Project Decision Matrix: تحديد مصير كل ملف.
+
+Architecture Requirements: استخراج ما يجب الاحتفاظ به أو تعديله أو بناؤه جديدًا.
+
+قاعدة نعتمدها للمشروع كله
+Never Repeat Verified Work. Reuse Evidence, Investigate Gaps, and Focus on Decisions.
+
+يعني لا نعيد قراءة 83 Skill، ولا نعيد تدقيق الـ Engine لمجرد إننا بنعمل Value Assessment.
+
+هدف Phase 3 هو اتخاذ قرارات على مستوى المشروع كله، مش إعادة إنتاج التقارير السابقة.
+
+وبكده نحافظ على الشغل اللي أنجزناه، ونوفر وقتنا للتحليل والتصميم والتنفيذ الفعلي. 🔧
+
+تمام دلوقتي هنعمل ايه
+دلوقتي هنبدأ Phase 3: Project-Wide Value Assessment.
+
+مش هنرجع نعمل Audit من الصفر، ومش هنبدأ نعدّل كود. هنستخدم كل نتائج التدقيق السابقة ونقيّم باقي مكونات CBH، ونطلع بقرارات واضحة لكل ملفات المشروع.
+
+خطواتنا من هنا
+نجمع نتائج الـ Audits القديمة: Skills، Engine، CLI، Agent، Runtime، Commands، Scripts، Testing والـ Documentation.
+
+نطابقها مع ملفات المشروع الحالية: نعرف كل ملف اتراجع قبل كده، وإيه المعلومات الناقصة فقط.
+
+نقيّم المشروع كله: نحدد قيمة كل مكون، مش بس هل الكود شغال، لكن هل وجوده ضروري وإيه دوره في المنتج.
+
+نرسم Dependency Map: نعرف كل ملف مرتبط بإيه، وتأثير تعديله على باقي النظام.
+
+نحدد القرارات: KEEP، MODIFY، REFACTOR، MERGE، REPLACE، CREATE NEW، DEPRECATE أو REMOVE.
+
+المطلوب من OpenCode الآن
+هنبعت له مهمة واحدة شاملة. يشتغل داخليًا على مجموعات حسب الحاجة، لكن يرجع لنا بالنتيجة النهائية كاملة. مش هنبعت Prompt لكل Batch.
+
+CBH — Phase 3: Project-Wide Value Assessment
+Mission
+Begin Phase 3 of CBH development.
+
+The previous phases are closed:
+
+Phase 0: Foundation & Repository Setup.
+
+Phase 1: Repository & Architecture Audit.
+
+Phase 2: Skills Deep Audit.
+
+The objective is to assess the value and future disposition of the entire CBH project, using existing audit evidence wherever possible.
+
+Repository: /home/kali/cbh-dev
+
+Baseline HEAD:
+9269278fec34d7d75bdf682a3d9b26c98339d648
+
+Critical Rule: Reuse Existing Audit Evidence
+Do NOT repeat completed audits.
+
+Existing evidence includes:
+
+The completed 83-Skill deep audit.
+
+The 22 supporting-file inspection records.
+
+The repository and architecture audit.
+
+Existing findings about CLI, Engine, Agent, Runtime, Commands, configuration, scripts, CI/CD, testing, and documentation.
+
+First locate and inspect the existing audit deliverables.
+
+Map existing findings to the current repository files.
+
+For each file, record:
+
+Previous audit status.
+
+Available evidence.
+
+Existing findings.
+
+Whether the file has changed since the audited baseline.
+
+Missing information required for a value decision.
+
+Only inspect a previously audited file again when a specific decision cannot be supported by existing evidence.
+
+Do not reread the 83 Skills.
+
+Do not rerun the Skills Deep Audit.
+
+Do not turn this phase into another audit campaign.
+
+Assessment Scope
+Assess all project-owned files and components, including:
+
+Skills and supporting references.
+
+Commands.
+
+CLI.
+
+Engagement Engine.
+
+Agent and provider integration.
+
+Runtime, state, memory, logging, and evidence.
+
+Reconnaissance and tool integration.
+
+Scripts and setup utilities.
+
+Configuration and manifests.
+
+Testing and evaluation.
+
+CI/CD workflows.
+
+Documentation.
+
+Templates and assets.
+
+Exclude .git internals, installed dependencies, caches, and generated artifacts from product-component scoring. Record their status or exclusion rationale where appropriate.
+
+Do not ignore configuration, lockfiles, manifests, or security-sensitive files merely because they are not source code.
+
+Per-File Assessment
+For every in-scope project-owned file, record:
+
+Exact path.
+
+Component category.
+
+Purpose.
+
+Product value.
+
+Necessity.
+
+Technical quality.
+
+Integration status.
+
+Dependencies and dependents.
+
+Security and safety relevance.
+
+Testing evidence.
+
+Existing audit references.
+
+Missing evidence.
+
+Recommended disposition.
+
+Confidence.
+
+Use these dispositions:
+
+KEEP AS-IS
+
+MODIFY
+
+REFACTOR
+
+MERGE
+
+SPLIT
+
+REPLACE
+
+CREATE NEW
+
+MOVE
+
+DEPRECATE
+
+REMOVE
+
+OPTIONAL
+
+Do not treat missing runtime verification as proof that a component is useless or broken.
+
+Clearly distinguish:
+
+Verified behavior.
+
+Static-code observations.
+
+Documented claims.
+
+Unverified assumptions.
+
+Project-Wide Analysis
+Evaluate:
+
+Whether every major component contributes to the CBH mission.
+
+Whether CLI and Engine responsibilities overlap.
+
+Whether the Agent abstraction is adequate.
+
+Whether provider integration is unnecessarily coupled.
+
+Whether Skills can actually be discovered and loaded by the runtime.
+
+Whether scope enforcement is consistent.
+
+Whether evidence and validation are reliable.
+
+Whether memory and state management have clear responsibilities.
+
+Whether testing covers actual system behavior.
+
+Whether documentation matches implementation.
+
+Whether dependencies and interfaces are unnecessarily complex.
+
+Which capabilities are missing and should be built new.
+
+Prioritize practical Web/API bug bounty hunting while preserving useful optional capabilities.
+
+Dependency & Impact Analysis
+Build a dependency map covering:
+
+Direct imports and calls.
+
+Configuration dependencies.
+
+Runtime interfaces.
+
+Skill and command references.
+
+Data flow.
+
+Shared responsibilities.
+
+Potential circular dependencies.
+
+High-impact components.
+
+For every proposed modification, identify affected files and components.
+
+Do not infer a runtime dependency solely from prose mentions.
+
+Deliverables
+Write only under:
+
+/tmp/opencode/cbh-audit/project-value-assessment/
+
+Produce:
+
+PROJECT_FILE_INVENTORY.csv
+All in-scope files, existing audit coverage, purpose, category, and assessment status.
+
+PROJECT_VALUE_ASSESSMENT.md
+Project-wide assessment, component value, quality, problems, risks, and missing capabilities.
+
+DEPENDENCY_IMPACT_MATRIX.csv
+Exact dependency relationships and potential modification impact.
+
+PROJECT_DECISION_MATRIX.csv
+One row per in-scope project-owned file with its proposed disposition and rationale.
+
+All deliverables must agree on file counts and paths.
+
+Execution Rules
+Complete the assessment across the entire project.
+
+Work internally in batches only when useful.
+
+Do not ask the user to submit separate prompts per batch.
+
+Do not produce intermediate reports that require another prompt to consolidate.
+
+Do not repeat verified reads or audits.
+
+Use targeted inspection only for unresolved questions.
+
+Do not change repository files.
+
+Do not implement decisions.
+
+Do not merge, delete, rename, move, or rewrite project files.
+
+Do not commit or push.
+
+Do not execute live scans or interact with targets.
+
+Final Validation
+Confirm:
+
+All in-scope project files are accounted for.
+
+Existing audit evidence is reused correctly.
+
+Previously audited files were not unnecessarily re-audited.
+
+Every assessed file has a proposed disposition.
+
+Uncertainty is explicitly recorded.
+
+Dependencies use exact file paths.
+
+All four deliverables agree.
+
+HEAD remains at the baseline.
+
+Working tree remains clean.
+
+Final Response
+Summarize:
+
+Total in-scope files assessed.
+
+Previously audited files reused.
+
+Files requiring targeted inspection.
+
+KEEP / MODIFY / REFACTOR / MERGE / REPLACE / CREATE NEW / DEPRECATE / REMOVE counts.
+
+Most important architectural problems.
+
+Major dependency and impact findings.
+
+Missing capabilities.
+
+Four deliverable paths.
+
+Repository-integrity results.
+
+STOP after Phase 3.
+
+Do not create the Unified System Architecture Blueprint yet. That is Phase 4 and will be based on the approved results of this assessment.
+
+The owner must review and approve the decisions before implementation.
+
+بعد ما يرجع
+هنراجع النتيجة، ونتأكد إن كل ملفات المشروع اتغطت، وإن الملفات القديمة استخدمت نتائج الـ Audit بدل إعادة شغلها.
+
+بعدها نقفل Phase 3، وننتقل إلى Phase 4: Unified System Architecture Blueprint. وقتها هنقرر CBH هيبقى مبني على إيه بالضبط، وإيه اللي هنعدله وإيه اللي هنكتبه جديد.
+
+الهدف دلوقتي إننا نخلص التقييم الشامل مرة واحدة، وبعده ندخل مرحلة تصميم النظام والتنفيذ من غير رجوع لنفس الدائرة.
+
+
+نص ملصق(20261103-135525).txt
+مستند
+يسطا، كده عندنا نتيجة Phase 3، وأخيرًا بدأنا نطلع من مرحلة التدقيق إلى قرارات تطوير CBH. 😄
+
+راجعت الـ Log، والنتيجة جيدة، لكن عندي شوية ملاحظات مهمة قبل ما نعتمدها ونبدأ الـ Blueprint.
+
+Phase 3 — Project-Wide Value Assessment
+Assessment generated Repository unchanged
+
+1. النتيجة بالأرقام
+298
+ملف داخل نطاق التقييم
+
+90
+Dependency relationships
+
+267
+KEEP AS-IS
+
+18
+MODIFY
+
+القرار
+
+العدد
+
+KEEP AS-IS
+
+267
+
+MODIFY
+
+18
+
+OPTIONAL
+
+12
+
+DEPRECATE
+
+1
+
+الإجمالي
+
+298
+
+التقييم استخدم نتائج Phase 1 وPhase 2، وأعاد استخدام الأدلة السابقة بدل إعادة قراءة الـ Skills. كما فحص 33 ملفًا بصورة محددة لاستكمال معلومات لم تكن موجودة. 
+نص ملصق(20261103-135525).txt
+
+2. أهم النتائج المعمارية
+دي أهم المشاكل التي ظهرت، وهنحتاج نحسمها في الـ Blueprint:
+
+المشكلة
+
+أهميتها
+
+CLI وEngine عندهم تداخل في Recon وSurface
+
+عالية جدًا
+
+Agent مرتبط بـ Claude CLI
+
+عالية
+
+Skill Loading مش موحد بين الـ Engine والـ Harness
+
+عالية جدًا
+
+Scope enforcement غير متسق بين CLI وEngine
+
+حرجة للتصميم
+
+Safety Gates مختلفة بين Skills
+
+عالية
+
+Runtime testing غير مكتمل
+
+عالية
+
+Documentation قديمة في بعض الأماكن
+
+متوسطة
+
+وفيه 6 قدرات مقترح بناؤها أو استكمالها:
+
+Engine-agnostic Skill Loading.
+
+Offline/Mock Runtime Testing.
+
+Scope Enforcement داخل CLI.
+
+Uniform Safety Gates.
+
+Skill-body testing sandbox.
+
+Documentation Refresh.
+
+3. ملاحظاتي على جودة النتيجة
+فيه 3 نقاط مش عايز نتجاهلها:
+
+أولًا: رقم 298 لا يعني أن كل ملف تمت مراجعته بنفس العمق.
+
+الـ Log يثبت وجود Inventory وDecision Matrix لكل الملفات، لكن التقييم اعتمد على أدلة سابقة وقراءة انتقائية وتصنيف بعض المكونات. محتاجين نراجع التبريرات الموجودة داخل الـ CSV قبل اعتبار كل قرار نهائيًا.
+
+ثانيًا: الـ Merge والـ Refactor لم يُحسما.
+
+عددهم صفر في جدول القرارات، رغم وجود تداخل واضح مثل:
+
+bug-bounty
+
+bb-local-toolkit
+
+bb-methodology
+
+وكذلك التداخل بين CLI وEngine.
+
+الـ Agent سجلها كمرشحين وترك القرار لـ Phase 4. ده مقبول في الوقت الحالي، لكن لازم الـ Blueprint يقدم قرارًا مقترحًا، مش مجرد يعيد ذكر المشكلة.
+
+ثالثًا: KEEP AS-IS عددها 267.
+
+مش معناه إن 267 ملفًا مثاليين، بل إن التصنيف الحالي لم يوصِ بتعديلهم. بعضهم قد يتأثر بتغييرات Architecture لاحقًا، وبالتالي لازم Dependency Impact Matrix تدخل في التصميم.
+
+4. قرارات التطوير التي يجب أن نحسمها في Phase 4
+دي الملفات والمكونات اللي هتكون محور التصميم:
+
+Core Architecture
+
+cbh/cli.py
+
+engine/engine.py
+
+engine/agent.py
+
+engine/skill_map.py
+
+engine/scope.py
+
+Skills Architecture
+
+Core vs Specialized Skills.
+
+Skill Loading Contract.
+
+Skill Routing.
+
+Supporting References.
+
+Safety Gates.
+
+Runtime & Evaluation
+
+Provider abstraction.
+
+State and Evidence.
+
+Mock Runtime.
+
+Skill Testing.
+
+Regression Evaluation.
+
+5. وضع المشروع الآن
+Phase
+
+الحالة
+
+Phase 0 — Foundation
+
+Closed
+
+Phase 1 — Architecture Audit
+
+Closed
+
+Phase 2 — Skills Deep Audit
+
+Closed
+
+Phase 3 — Project-Wide Assessment
+
+Assessment generated
+
+Phase 4 — Unified Architecture Blueprint
+
+Next
+
+لا توجد تعديلات على Source Code حتى الآن. كل المخرجات موجودة على Kali داخل:
+
+/tmp/opencode/cbh-audit/project-value-assessment/
+
+PROJECT_FILE_INVENTORY.csv
+
+PROJECT_VALUE_ASSESSMENT.md
+
+DEPENDENCY_IMPACT_MATRIX.csv
+
+PROJECT_DECISION_MATRIX.csv
+
+الخطوة التالية: Phase 4
+هنبني Unified System Architecture Blueprint اعتمادًا على نتائج التقييم، ونحسم فيه:
+
+الشكل النهائي للـ Skills Layer.
+
+العلاقة بين CLI وEngine.
+
+Agent وProvider Architecture.
+
+Runtime وScope Enforcement.
+
+Evidence وValidation.
+
+المكونات القديمة التي سنحتفظ بها.
+
+المكونات التي سنعدلها أو ندمجها.
+
+الملفات الجديدة التي سنحتاج إنشاءها.
+
+Dependency وMigration Plan.
+
+وبعدها Phase 5 هتكون Implementation Planning، ثم نبدأ التنفيذ الفعلي.
+
+المهم: مش هنرجع نعمل Audit تاني. هنستخدم النتائج الموجودة ونبدأ ناخد قرارات معمارية مبنية عليها.
+
+المفروض ابعتلو ملفات buggy و المنهجيه الي هنمشي عليها و ال Archtucture عشان يعرف يحدد الملفات و يفهمها فاهم يبقي عندو مرجعيه بيقيم عليها و الmodel الي استخدمتو سريع في ممكن استخدم واحد تاني
+فاهمك، ودي نقطة مهمة جدًا كان المفروض نعملها قبل Phase 3.
+
+أنت مش عايز OpenCode يقيّم CBH بناءً على رأيه العام في تصميم البرمجيات. أنت عايزه يفهم المنهجية والـ Architecture والقرارات اللي إحنا عايزين نبني عليها، وبعدها يقارن CBH بالمرجعية دي ويحدد إيه الموجود، وإيه الناقص، وإيه اللي محتاج يتغير.
+
+يعني عندنا 3 مصادر لازم نفرّق بينهم:
+
+CBH: المشروع المستهدف، وده اللي هنقيّمه ونطوّره.
+
+Buggy: مرجع معماري ومنهجي نستفيد منه، مش مشروع ننسخ كوده بالكامل.
+
+Our Development Methodology: القواعد والـ contracts وطريقة اتخاذ القرارات والتنفيذ والاختبار.
+
+وده هيغيّر طريقة Phase 4، بل ويخلّي مخرجات Phase 3 الحالية مدخلات مبدئية وليست قرارات نهائية.
+
+أيوه، وخلينا نوقف قبل Phase 4 ونجهّز المرجعية دي الأول. أنت محتاج OpenCode يفهم إحنا بنبني إيه، وبأي منهجية، وإيه المبادئ المعمارية اللي المفروض CBH يلتزم بيها، مش مجرد يقرأ 298 ملف ويطلع أحكامًا عامة.
+
+1. الملفات اللي هنستخدمها كمرجعية
+أنا أقترح نجهّز Reference Package من 3 أجزاء:
+
+A. Buggy — Architecture Reference
+
+الملفات المهمة، حسب الموجود عندك:
+
+AGENTS.md
+
+ملفات الـ Architecture Contracts الستة.
+
+agent-briefing.md
+
+prioritization.md
+
+runtime/registry.json
+
+وثائق الـ Runtime والـ Evidence والـ Validation.
+
+Phase 1 audit والـ retrospective.
+
+الهدف: استخراج المبادئ والتصميمات المفيدة التي يمكن الاستفادة منها في CBH.
+
+B. Development Methodology — Our Working Rules
+
+لازم نوثق طريقة تطوير المشروع:
+
+AI proposes → Runtime proves → Human decides.
+
+الأدوار: Architect / Builder / Repository Operator / Owner.
+
+Analyze → Design → Review → Approve → Implement → Verify.
+
+Architecture Contracts.
+
+File Ownership وChange Boundaries.
+
+Testing وAcceptance Criteria.
+
+No implementation without approval.
+
+الهدف: OpenCode يعرف كيف يعمل، وليس فقط ماذا يبني.
+
+C. CBH — Current State & Assessment
+
+هنستخدم المخرجات التي أنجزناها:
+
+PROJECT_FILE_INVENTORY.csv
+
+PROJECT_VALUE_ASSESSMENT.md
+
+DEPENDENCY_IMPACT_MATRIX.csv
+
+PROJECT_DECISION_MATRIX.csv
+
+تقارير Phase 1 وPhase 2.
+
+الهدف: يربط المرجعية بالمشروع الحالي ويحدد التغييرات المطلوبة.
+
+2. إزاي OpenCode يستخدم Buggy؟
+دي نقطة مهمة جدًا:
+
+مش هنطلب منه يحوّل CBH إلى Buggy أو ينسخ Architecture بتاع Buggy.
+
+هنطلب منه يعمل مقارنة:
+
+Buggy Reference
+
+CBH Current State
+
+المطلوب
+
+Architecture Contract
+
+المكون المقابل في CBH
+
+هل يطبّقه؟
+
+Runtime Registry
+
+Tool/Skill Registry
+
+هل التصميم مناسب؟
+
+Evidence Model
+
+Evidence/Validation
+
+هل توجد فجوة؟
+
+Agent Workflow
+
+CBH Agent
+
+هل نحتاج إعادة تصميم؟
+
+Testing Methodology
+
+CBH Eval
+
+ما الذي ينقص؟
+
+وبعدين يصنّف كل اختلاف:
+
+Adopt: نستخدم التصميم كما هو.
+
+Adapt: نستخدم الفكرة مع تعديلها.
+
+Reject: غير مناسبة لـ CBH.
+
+New Design: نحتاج تصميمًا جديدًا.
+
+Buggy مرجع، وليس مصدرًا للقرارات النهائية. وCBH يظل مشروعًا مستقلًا.
+
+أقترح وضع الملفات خارج الـ Repository، حتى لا تختلط بملفات المنتج:
+
+/tmp/opencode/cbh-reference/
+├── buggy/
+│   ├── architecture/
+│   ├── contracts/
+│   ├── runtime/
+│   └── retrospective/
+├── methodology/
+│   ├── development-process.md
+│   ├── agent-roles.md
+│   ├── change-control.md
+│   └── verification-rules.md
+└── REFERENCE_INDEX.md
+3. بالنسبة للموديل المستخدم
+نعم، أنصح بتغيير الموديل الأساسي في المرحلة القادمة.
+
+الـ Log الأخير استخدم Mercury 3 Inception. هو مصمم للتطبيقات السريعة والـ Agentic Workflows، ويدعم Tool Calling وسياقًا يصل إلى مليون Token. 
+
+OpenRouter
++1
+
+لكن السرعة ليست معيارًا كافيًا لاختيار موديل يقرر Architecture مشروع كامل. حتى التقييمات المستقلة المنشورة له تعطي نتائج متفاوتة في مهام البرمجة والـ Agentic Coding. 
+
+Vals AI
++1
+
+التوزيع الذي أنصح به
+المهمة
+
+نوع الموديل
+
+Architecture Analysis
+
+موديل قوي في Reasoning
+
+Project-wide synthesis
+
+نفس الموديل القوي
+
+استخراج بيانات الملفات
+
+Mercury 3 أو موديل سريع
+
+بناء المصفوفات والتوثيق
+
+موديل متوسط أو سريع
+
+Final Review
+
+موديل مستقل قوي
+
+من البدائل التي تستحق المقارنة، DeepSeek V4 Pro وClaude Opus وGPT-6، حسب ما هو متاح لك في OpenCode. نتائج DeepSeek V4 Pro المنشورة في اختبارات LiveCodeBench قوية، لكن ده لا يثبت وحده أنه الأفضل في Architecture Design. 
+
+vellum.ai
++1
+
+اختياري المبدئي: موديل Reasoning قوي يكون الـ Main Agent، وMercury 3 يشتغل كـ Subagent للمهام السريعة. أنا أكون الـ Architect/Reviewer الخارجي كالعادة.
+
+4. نعمل إيه دلوقتي بالترتيب؟
+تبعت ملفات Buggy الخاصة بالـ Architecture Contracts والـ Runtime والـ Methodology.
+
+نراجعها ونحدد الملفات المهمة فعلًا، ونجهز Reference Index.
+
+نضع الـ Reference Package لدى OpenCode بصلاحية قراءة فقط.
+
+نعمل Reference Alignment Review لنتائج Phase 3، بدون إعادة تقييم 298 ملف من الصفر.
+
+نبدأ Phase 4: Unified System Architecture Blueprint.
+
+محتاج منك الآن ملفات Buggy الأصلية، خصوصًا الـ Architecture Contracts الستة وملفات الـ Runtime والمنهجية. لا تبعت الـ Repository كله؛ عايزين المراجع التصميمية والقرارات المعمارية، مش نفتح مشروعًا ثانيًا ونعيد رحلة الـ 83 Skill من أولها. 😅
+
+وبالنسبة للموديل، شغّل في Kali:
+
+opencode models
+
+وابعت لي القائمة المتاحة عندك. هنختار منها موديلًا أساسيًا مناسبًا للـ Architecture، بدل ما نخمن اسم موديل أو نختار الأسرع وخلاص.
+
+
+نص ملصق(20261103-140753).txt
+مستند
+انت قولي ايه الي محتاجو عندي انا اجهزهولك و بردو الملفات الي بعتهالك قبل كدا الي هيا المصادر الي من خلالها بنيت buggy و فيه كام حاجه ممكن ناخد تعديلات  يعني مش عايز اتسرع في التطوير و بناء blue print عايز لما ابنيه يكون كل حاجه تمام و يكون واصل لاحسن نتيجه   منهم زي Ai-Hunting
+
+Public
+
+0xmannaf (image)0xmannaf
+
+Initial commit
+
+3c1e9a0 · last month
+
+Name		
+.agents/skills	Initial commit	last month
+.github/workflows	Initial commit	last month
+.opencode/commands	Initial commit	last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+last month
+Ask Copilot about this repository
+This repository doesn't have a README yet. Ask Copilot to learn how this p          انتبهوا أعزائي مجتمع أمن المعلومات
+بفضل أنا بدأت مشروع اسمه OffsecDataset ده مشروع أنا مجمع فيه حتى الآن كل التقارير Public المنشورة على HackerOne بالتفاصيل الكاملة الموجودة فيها وكمان كل CVEs اللي نزلت من سنة 2000 حتى الآن بآخر تحديث امبارح بكل التفاصيل وطرق الاستغلال وكل شيء
+الهدف إني بعمل نموذج لغوي كبير LLM يكون Uncensored أقدر أستخدمه في اختبار الاختراق وBug Bounty ولغاية دلوقتي أنا عملت تدريب كويس على نموذج Qwen3.5-4B بالداتا دي مع شوية Harness طلع نتائج كويسة
+المشروع موجود علي huggingface الداتا حجمها مش كبير لكن باذن الله هطورها من الوقت وتقدر تستخدمها دلوقتي      Dataset card
+Data Studio
+Files and versions
+xet
+Community
+OffsecCyber
+92.8 MB
+Ctrl+K
+
+1 contributor
+Secfathy's picture
+Secfathy
+Upload folder using huggingface_hub
+e1f63fa
+verified
+about 3 hours ago
+.gitattributes
+2.55 kB
+Upload folder using huggingface_hub
+about 3 hours ago
+LICENSE
+11.4 kB
+Upload folder using huggingface_hub
+about 3 hours ago
+README.md
+7.52 kB
+Upload folder using huggingface_hub
+about 3 hours ago
+banner.png
+1.35 MB
+xet
+Upload folder using huggingface_hub
+about 3 hours ago
+manifest.json
+3.82 kB
+Upload folder using huggingface_hub
+about 3 hours ago
+test.jsonl
+4.28 MB
+Upload folder using huggingface_hub
+about 3 hours ago
+train.jsonl
+83 MB
+xet
+Upload folder using huggingface_hub
+about 3 hours ago
+valid.jsonl
+4.2 MB
+Upload folder using huggingface_hub
+about 3 hours ago
+
+…

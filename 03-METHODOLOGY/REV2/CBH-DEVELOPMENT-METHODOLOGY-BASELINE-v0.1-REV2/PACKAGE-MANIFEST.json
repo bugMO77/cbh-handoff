@@ -1,0 +1,66 @@
+{
+  "package_name": "CBH-DEVELOPMENT-METHODOLOGY-BASELINE-v0.1-REV2",
+  "document_version": "0.1",
+  "revision": "REV2",
+  "status": "DRAFT_OWNER_REVIEW",
+  "generated_date": "2026-11-05",
+  "files": [
+    {
+      "path": "DEVELOPMENT_METHODOLOGY_BASELINE_v0.1.md",
+      "bytes": 32685,
+      "sha256": "01f6cbab088d99d0ad5c1ad12d9f0734dfc9659aa0febd0b25f4ffdffb0740f5"
+    },
+    {
+      "path": "OPENCODE-VERIFY-PROMPT.md",
+      "bytes": 5504,
+      "sha256": "ab8ad7068d9c7d160b77683fd027929ab4090a247052e1412e7e96b30257a278"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2365,
+      "sha256": "08585097daab1beb310a6ea5d15fe151826de276a1073c6a04d97708bfea4a7e"
+    },
+    {
+      "path": "REVISION_NOTES.md",
+      "bytes": 22535,
+      "sha256": "70965572c3fc0c4767e4858164dbef295ebf0f6c639ef20fc4bac2e62e18aa46"
+    },
+    {
+      "path": "SOURCE_TRACEABILITY_AND_OPEN_DECISIONS.md",
+      "bytes": 23635,
+      "sha256": "033817414d2a260a43dc5d2e6c37e35835c6816d00a564e7102272c3bc78140d"
+    },
+    {
+      "path": "source-reference/BUGGY_STAGE2_AUTHORITY_DECISION_QUEUE.md",
+      "bytes": 3357,
+      "sha256": "950956f1cee85276938444c77246c66a95327e6fa6105753dce1ef39dffdd22b"
+    },
+    {
+      "path": "source-reference/BUGGY_STAGE2_SOURCE_AUTHORITY_AUDIT.md",
+      "bytes": 17269,
+      "sha256": "9c8a1515f118d4a82a289f57e77742b7a4eecdae3ec24c44afd9add539bc03d5"
+    },
+    {
+      "path": "source-reference/CBH_COMPLETE_HANDOFF.md",
+      "bytes": 99060,
+      "sha256": "afd026a0c444d4ca14f90911f7fb5f302175a90221ace87fcb68002ec94856da"
+    },
+    {
+      "path": "source-reference/CBH_PROJECT_HISTORY_AND_PHASE_REPORTS_2026-11-03.docx",
+      "bytes": 90583,
+      "sha256": "e79fc0fb8962599dbe63bf71e9d3240694dcee0efde3dcbabafcecba7208d9b5"
+    },
+    {
+      "path": "source-reference/PROVENANCE.md",
+      "bytes": 3127,
+      "sha256": "aa5d0922809dce9d7eca32f45e15e5d1ce43480d470b300f12cdea721f6d94a7"
+    },
+    {
+      "path": "source-reference/نص ملصق(20261103-152241).txt",
+      "bytes": 36866,
+      "sha256": "4c2e6a51a3a9c3548dc493ac96cab73a45d7650112cb62e071475c02029cb217"
+    }
+  ],
+  "total_files": 11,
+  "total_bytes": 336986
+}
